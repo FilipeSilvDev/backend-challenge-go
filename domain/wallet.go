@@ -38,7 +38,7 @@ func NewWallet(id, playerId string, initialBalance Money) (Wallet, error) {
 	}, nil
 }
 
-func HudrateWallet(id, playerId string, balance Money, version int64, createdAt, updatedAt time.Time) Wallet {
+func HydrateWallet(id, playerId string, balance Money, version int64, createdAt, updatedAt time.Time) Wallet {
 	return Wallet{
 		id: 		id,
 		playerId: 	playerId,
