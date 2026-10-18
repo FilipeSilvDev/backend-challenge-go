@@ -70,11 +70,11 @@ func NewLedgerEntry(
 	}, nil
 }
 
-func (l WalletLedgerEntry) ID() string            { return l.id }
-func (l WalletLedgerEntry) WalletID() string      { return l.walletID }
-func (l WalletLedgerEntry) TransactionID() string { return l.transactionID }
-func (l WalletLedgerEntry) Direction() LedgerDirection { return l.direction }
-func (l WalletLedgerEntry) Money() Money          { return l.money }
-func (l WalletLedgerEntry) BalanceBefore() Money  { return l.balanceBefore }
-func (l WalletLedgerEntry) BalanceAfter() Money   { return l.balanceAfter }
-func (l WalletLedgerEntry) CreatedAt() time.Time  { return l.createdAt }
+func (l WalletLedgerEntry) ID() string            		{ return l.id }
+func (l WalletLedgerEntry) WalletID() string      		{ return l.walletID }
+func (l WalletLedgerEntry) TransactionID() string 		{ return l.transactionID }
+func (l WalletLedgerEntry) Direction() LedgerDirection 	{ return l.direction }
+func (l WalletLedgerEntry) Money() Money          		{ return l.money }
+func (l WalletLedgerEntry) BalanceBefore() Money  		{ return l.balanceBefore }
+func (l WalletLedgerEntry) BalanceAfter() Money   		{ return l.balanceAfter }
+func (l WalletLedgerEntry) CreatedAt() time.Time  		{ return l.createdAt }

@@ -10,7 +10,7 @@ import (
 
 var (
 	ErrWalletNotFound = errors.New("carteira não encontrada")
-	ErrConcurrencyConflict = errors.New("conflito de concorrência detectado na carteira, tente novamente")
+	ErrConcurrenyConflict = errors.New("conflito de concorrência detectado na carteira, tente novamente")
 )
 
 type WalletRepository struct {
@@ -22,7 +22,7 @@ func NewWalletRepository(db *sql.DB) *WalletRepository {
 }
 
 // Salva persistência em nova carteira
-func (r *WalletRepository) save(ctx context.Context, tx *sql.Tx, wallet domain.Wallet) error {
+func (r *WalletRepository) Save(ctx context.Context, tx *sql.Tx, wallet domain.Wallet) error {
 	query := `
 		INSERT INTO wallets (id, player_id, currency, balance_amount, version, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -30,15 +30,15 @@ func (r *WalletRepository) save(ctx context.Context, tx *sql.Tx, wallet domain.W
 	bal := wallet.Balance()
 	exec := func(q interface{ ExecContext(context.Context, string, ...any) (sql.Result, error) }) error {
 		_, err := q.ExecContext(ctx, query,
-				wallet.ID(),
-				wallet.PlayerID(),
-				bal.Currency(),
-				bal.Amount(),
-				wallet.Version(),
-				wallet.CreatedAt(),
-				wallet.UpdatedAt(),
-			)
-			return err
+			wallet.ID(),
+			wallet.PlayerID(),
+			bal.Currency(),
+			bal.Amount(),
+			wallet.Version(),
+			wallet.CreatedAt(),
+			wallet.UpdatedAt(),
+		)
+		return err
 	}
 
 	if tx != nil {
@@ -53,7 +53,6 @@ func (r *WalletRepository) FindByID(ctx context.Context, tx *sql.Tx, walletID st
 		id, player_id, currency, balance_amount, version, created_at, updated_at
 		FROM wallets WHERE id = $1
 	`
-
 	if forUpdate {
 		query = "SELECT " + query + " FOR UPDATE"
 	} else {
@@ -64,7 +63,7 @@ func (r *WalletRepository) FindByID(ctx context.Context, tx *sql.Tx, walletID st
 	var balanceAmount, version int64
 	var createdAt, updatedAt sql.NullTime
 
-	row := func(q interface { QueryRowContext(context.Context, string, ...any) *sql.Row }) *sql.Row {
+	row := func(q interface{ QueryRowContext(context.Context, string, ...any) *sql.Row }) *sql.Row {
 		return q.QueryRowContext(ctx, query, walletID)
 	}
 
@@ -117,7 +116,7 @@ func (r *WalletRepository) UpdateBalance(ctx context.Context, tx *sql.Tx, wallet
 	}
 
 	if rowsAffected == 0 {
-		return ErrConcurrencyConflict
+		return ErrConcurrenyConflict
 	}
 
 	return nil

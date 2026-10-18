@@ -7,7 +7,7 @@ import (
 
 	"backend-challenge-go/config"
 
-	_ "github.com/jackc/pgx/v5/stdlib" // Driver pgx para database/sql
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/fx"
 )
 
@@ -26,11 +26,11 @@ func NewDatabaseConnection(lc fx.Lifecycle, cfg *config.Config) (*sql.DB, error)
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			log.Println("🔌 Conectando ao banco de dados PostgreSQL...")
+			log.Println("[BANCO DE DADOS] Conectando ao banco de dados PostgreSQL...")
 			return db.PingContext(ctx)
 		},
 		OnStop: func(ctx context.Context) error {
-			log.Println("🛑 Fechando conexão com o PostgreSQL...")
+			log.Println("[BANCO DE DADOS] Fechando conexão com o PostgreSQL...")
 			return db.Close()
 		},
 	})

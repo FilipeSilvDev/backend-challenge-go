@@ -27,12 +27,11 @@ func NewWagerRepository(db *sql.DB) *WagerRepository {
 func (r *WagerRepository) SaveTransaction(ctx context.Context, tx *sql.Tx, t domain.WagerTransaction) error {
 	query := `
 		INSERT INTO wager_transactions (
-			id, provier_id, external_transaction_id, idempotency_key, payload_hash, wallet_id,
-			player_id, round_id, game_id, kind, amount, currency, referency_external_transaction_id,
-			status, failure_code, created_at, updated_at
-		) VALUE ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+			id, provider_id, external_transaction_id, idempotency_key, payload_hash,
+			wallet_id, player_id, round_id, game_id, kind, amount, currency,
+			reference_external_transaction_id, status, failure_code, created_at, updated_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
 	`
-
 	money := t.Money()
 	var refID *string
 	if t.ReferenceExternalTransactionID() != nil {
@@ -45,12 +44,12 @@ func (r *WagerRepository) SaveTransaction(ctx context.Context, tx *sql.Tx, t dom
 			t.ProviderID(),
 			t.ExternalTransactionID(),
 			t.IdempotencyKey(),
-			t.PayloadHas(),
+			t.PayloadHash(),
 			t.WalletID(),
 			t.PlayerID(),
 			t.RoundID(),
 			t.GameID(),
-			string(t.KindID()),
+			string(t.Kind()),
 			money.Amount(),
 			money.Currency(),
 			refID,
@@ -71,9 +70,9 @@ func (r *WagerRepository) SaveTransaction(ctx context.Context, tx *sql.Tx, t dom
 // Busca transação pela chave de idempotência
 func (r *WagerRepository) FindByIdempotencyKey(ctx context.Context, idempotencyKey string) (domain.WagerTransaction, error) {
 	query := `
-		id, provider_id, exernal_transaction_id, idempotency_key, payload_hash, wallet_id,
-		player_id, round_id, game_id, king, amount, currency, reference_external_transaction_id,
-		status, failure_code, created_at, updated_at
+		id, provider_id, external_transaction_id, idempotency_key, payload_hash,
+		wallet_id, player_id, round_id, game_id, kind, amount, currency,
+		reference_external_transaction_id, status, failure_code, created_at, updated_at
 		FROM wager_transactions WHERE idempotency_key = $1
 	`
 	return r.querySingleTransaction(ctx, r.db, "SELECT "+query, idempotencyKey)
@@ -134,7 +133,7 @@ func (r *WagerRepository) SaveOutboxEvent(ctx context.Context, tx *sql.Tx, event
 	return exec(r.db)
 }
 
-func (r *WagerRepository) querySingleTransaction(ctx context.Context, q interface{
+func (r *WagerRepository) querySingleTransaction(ctx context.Context, q interface {
 	QueryRowContext(context.Context, string, ...any) *sql.Row
 }, query string, args ...any) (domain.WagerTransaction, error) {
 	var id, providerID, extTxID, idemKey, payloadHash, walletID, playerID, roundID, gameID, kindStr, currency string
@@ -145,9 +144,9 @@ func (r *WagerRepository) querySingleTransaction(ctx context.Context, q interfac
 	var createdAt, updatedAt time.Time
 
 	err := q.QueryRowContext(ctx, query, args...).Scan(
-		&id, &providerID, &extTxID, &idemKey, &payloadHash, &walletID,
-		&playerID, &roundID, &gameID, &kindStr, &amount, &currency, &refExtTxID,
-		&statusStr, &failureCode, &createdAt, &updatedAt,
+		&id, &providerID, &extTxID, &idemKey, &payloadHash,
+		&walletID, &playerID, &roundID, &gameID, &kindStr, &amount, &currency,
+		&refExtTxID, &statusStr, &failureCode, &createdAt, &updatedAt,
 	)
 
 	if err != nil {
@@ -167,11 +166,13 @@ func (r *WagerRepository) querySingleTransaction(ctx context.Context, q interfac
 		refPtr = &refExtTxID.String
 	}
 
-	// Utiliza construtores ou mapeamento direto de domínio
+	// Re-hidratação utilizando construtores ou mapeamento direto de domínio
+	// Para simplificar a demonstração, retornamos uma struct montada com os dados recuperados
 	return domain.HydrateWagerTransaction(
-		id, providerID, extTxID, idemKey, payloadHash, walletID,
-		playerID, roundID, gameID, domain.TransactionKind(kindStr), money,
-		refPtr, domain.TransactionStatus(statusStr), failureCode.Ptr(),
+		id, providerID, extTxID, idemKey, payloadHash,
+		walletID, playerID, roundID, gameID,
+		domain.TransactionKind(kindStr), money, refPtr,
+		domain.TransactionStatus(statusStr), &failureCode.String,
 		createdAt, updatedAt,
 	), nil
 }
