@@ -1,7 +1,10 @@
 package config
 
 import (
+	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -12,6 +15,11 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("err carregar os enviroments: %v", err)
+	}
+	
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -21,6 +29,7 @@ func LoadConfig() (*Config, error) {
 	if dbURL == "" {
 		dbURL = "postgres://postgres:postgres@localhost:5432/wagering_db?sslmode=disable"
 	}
+
 
 	return &Config{
 		Port: 			port,
