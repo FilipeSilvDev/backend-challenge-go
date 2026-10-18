@@ -118,7 +118,7 @@ func (m Money) String() string {
 
 func (m Money) MarshalJSON() ([]byte, error) {
 	str := m.String()
-	return []byte(fmt.Sprintf(`{"amount":"%s", "currency":"%s"}`, str, m.currency)), nil
+	return fmt.Appendf(nil, `{"amount":"%s", "currency":"%s"}`, str, m.currency), nil
 }
 
 func parseToCents(s string) (int64, error) {

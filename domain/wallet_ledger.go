@@ -36,16 +36,17 @@ func NewLedgerEntry(
 		return WalletLedgerEntry{}, errors.New("identificadores obrigatórios do lançamento não informados")
 	}
 
-	// Validação da invariante de cálculo do extrato
+	// Validação de cálculo do extrato
 	var expectedAfter Money
 	var err error
 
-	if direction == DirectionCredit {
-		expectedAfter, err = balanceBefore.Add(money)
-	} else if direction == DirectionDebit {
-		expectedAfter, err = balanceBefore.Sub(money)
-	} else {
-		return WalletLedgerEntry{}, errors.New("direção de lançamento inválida")
+	switch direction {
+		case DirectionCredit:
+			expectedAfter, err = balanceBefore.Add(money)
+		case DirectionDebit:
+			expectedAfter, err = balanceBefore.Sub(money)
+		default:
+			return WalletLedgerEntry{}, errors.New("direção de lançamento inválida")
 	}
 
 	if err != nil {
