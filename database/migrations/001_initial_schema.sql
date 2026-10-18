@@ -1,6 +1,6 @@
 -- Descrição: Criação das tabelas principais para carteiras, transações de apostas, ledger, inbox e outbox.
 
-CREATE EXTENSIONS IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 1. Tabela de Carteiras
 CREATE TABLE IF NOT EXISTS wallets (
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS outbox_events (
     attempts INT NOT NULL DEFAULT 0,
     next_delivery_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     published_at TIMESTAMP WITH TIME ZONE,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Índice para outbox buscar eventos pendentes de forma eficiente

@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+.git/**
+Dockerfile
+README*.md
+ARCHITECTURE.md
+tests/
+**/*_test.go
